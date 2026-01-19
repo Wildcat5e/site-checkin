@@ -11,11 +11,16 @@ function getStudentList() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const sheet = ss.getSheetByName('Students');
   const data = sheet.getDataRange().getValues();
-  const headers = data.shift(); // Remove headers
+  
+  // Remove headers
+  if (data.length > 0) data.shift();
   
   let studentMap = {};
   data.forEach(row => {
-    studentMap[row[0]] = row[1]; 
+    // Name is Col A (index 0), Grade is Col B (index 1)
+    if (row[0]) { 
+      studentMap[row[0]] = row[1]; 
+    }
   });
   
   return studentMap;
@@ -25,43 +30,73 @@ function getStudentList() {
 function processForm(formObject) {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
   const studentSheet = ss.getSheetByName('Students');
+  const logsSheet = ss.getSheetByName('Logs');
   
   const name = formObject.studentName;
   const grade = formObject.grade; 
-  const type = formObject.checkType; // Passed from the button click
+  const type = formObject.checkType; // "Check In" or "Check Out"
   const notes = formObject.notes || "";
+  const timeString = formObject.manualTime; // HH:mm
   
-  // Use the calculated 24h time sent from frontend
-  const timeString = formObject.manualTime; 
-  
-  // Use server time for Date (assuming check-in is for "today")
   const now = new Date();
   const dateString = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd");
+  const timestamp = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd HH:mm:ss");
 
-  // A. UPDATE STUDENT GRADE IF NEEDED
-  updateStudentGrade(name, grade, studentSheet);
+  // A. UPDATE STUDENT RECORD (Status, Last Seen, Grade, etc.)
+  updateStudentRecord(studentSheet, name, grade, type, timestamp);
 
-  // B. LOG DATA TO SINGLE TAB
-  const targetSheet = ss.getSheetByName('Logs');
-  
-  // Appends: Name, Grade, Type (In/Out), Time, Date, Notes
-  targetSheet.appendRow([name, grade, type, timeString, dateString, notes]);
+  // B. LOG DATA TO LOGS TAB
+  // Logs: Name, Grade, Type, Time, Date, Notes
+  logsSheet.appendRow([name, grade, type, timeString, dateString, notes]);
   
   return { status: "SUCCESS", type: type };
 }
 
-function updateStudentGrade(name, newGrade, sheet) {
+/* 3. CORE LOGIC FOR UPDATING STUDENTS SHEET */
+function updateStudentRecord(sheet, name, newGrade, type, timestamp) {
   const data = sheet.getDataRange().getValues();
-  
-  // Look for the student
+  let rowIndex = -1;
+
+  // 1. FIND ROW
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === name) {
-      if (String(data[i][1]) !== String(newGrade)) {
-        sheet.getRange(i + 1, 2).setValue(newGrade);
-      }
-      return;
+      rowIndex = i + 1; // Convert 0-index to Sheet Row Number
+      break;
     }
   }
+
+  // 2. IF NEW STUDENT (Add them)
+  if (rowIndex === -1) {
+    // Append: Name, Grade, Status(empty), LastIn(empty), LastOut(empty), GradeChanged(empty), DateAdded
+    sheet.appendRow([name, newGrade, "", "", "", "", timestamp]);
+    rowIndex = sheet.getLastRow(); // Get the new row number
+  }
+
+  // 3. CHECK FOR GRADE CHANGE (Col B -> Column 2)
+  // We grab the specific cell to check current value
+  const gradeCell = sheet.getRange(rowIndex, 2);
+  const currentGrade = gradeCell.getValue();
   
-  sheet.appendRow([name, newGrade]);
+  // Only update if grade is different AND it's not a brand new user (handled above)
+  // (If new user, currentGrade matches newGrade because we just wrote it, so this skips)
+  if (String(currentGrade) !== String(newGrade)) {
+    gradeCell.setValue(newGrade);
+    // Update "Grade Last Changed" (Col F -> Column 6)
+    sheet.getRange(rowIndex, 6).setValue(timestamp);
+  }
+
+  // 4. UPDATE STATUS & LAST SEEN
+  const statusCell = sheet.getRange(rowIndex, 3); // Col C
+  
+  if (type === "Check In") {
+    // Set Status Text & Color
+    statusCell.setValue("Checked In").setBackground("#d9ead3"); // Light Green
+    // Update Last Check In (Col D -> Column 4)
+    sheet.getRange(rowIndex, 4).setValue(timestamp);
+  } else {
+    // Set Status Text & Color
+    statusCell.setValue("Checked Out").setBackground("#f4cccc"); // Light Red
+    // Update Last Check Out (Col E -> Column 5)
+    sheet.getRange(rowIndex, 5).setValue(timestamp);
+  }
 }
