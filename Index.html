@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+      /* --- FUTURISTIC TECH THEME CSS --- */
+      :root {
+        --neon-blue: #00f3ff;
+        --neon-green: #0aff60;
+        --dark-bg: #0b0c10;
+        --panel-bg: #1f2833;
+        --text-color: #c5c6c7;
+      }
+
+      body {
+        background-color: var(--dark-bg);
+        color: var(--text-color);
+        font-family: 'Roboto Mono', monospace;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+        background-image: 
+          linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+
+      .container {
+        background-color: var(--panel-bg);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+        border: 1px solid var(--neon-blue);
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+      }
+
+      h1 {
+        font-family: 'Orbitron', sans-serif;
+        color: var(--neon-blue);
+        text-align: center;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 2.5rem;
+        text-shadow: 0 0 10px var(--neon-blue);
+      }
+
+      label {
+        display: block;
+        margin-top: 20px;    /* Gap ABOVE the label (Between sections) */
+        margin-bottom: 6px; /* Gap BELOW the label (Between text and box) */
+        font-size: 0.9rem;
+        color: var(--neon-blue);
+      }
+
+      /* Input Fields */
+      input[type="text"], input[type="list"] {
+        width: 100%;
+        padding: 10px;
+        margin-top: 0;
+        margin-bottom: 5px;
+        background: #0b0c10;
+        border: 1px solid #45a29e;
+        color: white;
+        font-family: 'Roboto Mono', monospace;
+        box-sizing: border-box; /* Fixes padding issues */
+      }
+
+      /* Removes the extra gap from the very first label so it sits tight to the title */
+      form > label:first-of-type {
+        margin-top: 0;
+      }
+
+      /* --- CUSTOM DROPDOWN STYLING --- */
+      .input-wrapper {
+        position: relative;
+        width: 100%;
+      }
+      
+      .suggestions-list {
+        display: none; /* Hidden by default */
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        max-height: 200px;
+        overflow-y: auto;
+        background-color: var(--panel-bg);
+        border: 1px solid var(--neon-blue);
+        border-top: none;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
+      }
+      
+      /* Scrollbar styling for the list */
+      .suggestions-list::-webkit-scrollbar {
+        width: 8px;
+        background: var(--dark-bg);
+      }
+      .suggestions-list::-webkit-scrollbar-thumb {
+        background: var(--neon-blue);
+        border-radius: 4px;
+      }
+      
+      .suggestions-list li {
+        padding: 12px;
+        border-bottom: 1px solid #333;
+        color: var(--text-color);
+        cursor: pointer;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+      }
+      
+      .suggestions-list li:hover {
+        background-color: rgba(0, 243, 255, 0.1); /* Low opacity neon blue */
+        color: white;
+        padding-left: 15px; /* Slight movement effect */
+        border-left: 3px solid var(--neon-blue);
+      }
+      
+      .suggestions-list li strong {
+        color: var(--neon-green); /* Highlight the typed letters */
+      }
+      
+      /* Grade & Radio Buttons */
+      .radio-group {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 0;
+      }
+      
+      .radio-option {
+        position: relative;
+        cursor: pointer;
+      }
+      
+      .radio-option input {
+        /* We use opacity 0 instead of display: none so Tabbing still works */
+        opacity: 0;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        cursor: pointer;
+      }
+      
+      /* Accessibility: Show a white glow when Tabbing */
+      .radio-option input:focus + span {
+        box-shadow: 0 0 15px white, 0 0 5px var(--neon-blue);
+        border-color: white;
+        transform: scale(1.05); /* Slight zoom to show active state */
+      }
+
+      .radio-option span {
+        display: inline-block;
+        padding: 8px 12px;
+        border: 1px solid #45a29e;
+        color: #45a29e;
+        transition: 0.3s;
+        font-size: 0.8rem;
+      }
+      
+      .radio-option input:checked + span {
+        background: var(--neon-blue);
+        color: #000;
+        box-shadow: 0 0 10px var(--neon-blue);
+        font-weight: bold;
+      }
+
+      /* Check In/Out Specific Styling */
+      .action-group .radio-option input:checked + span.check-in-btn {
+        background: var(--neon-green);
+        box-shadow: 0 0 10px var(--neon-green);
+      }
+      
+      .action-group .radio-option input:checked + span.check-out-btn {
+        background: #ff0055;
+        box-shadow: 0 0 10px #ff0055;
+        color: white;
+      }
+
+      button.submit-btn {
+        width: 100%;
+        margin-top: 25px;
+        padding: 12px;
+        background: transparent;
+        border: 2px solid var(--neon-blue);
+        color: var(--neon-blue);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: 0.3s;
+        text-transform: uppercase;
+      }
+
+      button.submit-btn:hover {
+        background: var(--neon-blue);
+        color: #000;
+        box-shadow: 0 0 20px var(--neon-blue);
+      }
+      
+      /* Loading Overlay */
+      #loading {
+        display: none;
+        position: absolute;
+        top:0; left:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.9);
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        z-index: 10;
+        border-radius: 10px;
+      }
+
+      /* Status Message Text */
+      #statusMsg {
+        text-align: center; /* This forces the text to be centered */
+        width: 100%;        /* Ensures it spans the full width of the container */
+        margin-top: 15px;
+        color: white;
+        font-family: 'Orbitron', sans-serif;
+        line-height: 1.5;
+      }
+
+      .spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--neon-blue);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+      }
+      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    </style>
+  </head>
+  <body>
+
+    <div class="container">
+      <h1>FRC Check In/Out</h1>
+      
+      <form id="accessForm" onsubmit="handleFormSubmit(event)">
+        
+        <label>STUDENT NAME</label>
+        <div class="input-wrapper">
+          <input type="text" name="studentName" id="studentNameInput" 
+                 placeholder="Begin typing name..." required autocomplete="off" 
+                 oninput="showSuggestions()" onfocus="showSuggestions()">
+
+          <ul id="suggestions" class="suggestions-list"></ul>
+        </div>
+
+        <label>GRADE</label>
+        <div class="radio-group">
+          <label class="radio-option"><input type="radio" name="grade" value="9" ><span>09</span></label>
+          <label class="radio-option"><input type="radio" name="grade" value="10"><span>10</span></label>
+          <label class="radio-option"><input type="radio" name="grade" value="11"><span>11</span></label>
+          <label class="radio-option"><input type="radio" name="grade" value="12"><span>12</span></label>
+        </div>
+
+        <label>OPERATION</label>
+        <div class="radio-group action-group">
+          <label class="radio-option">
+            <input type="radio" name="checkType" value="Check In" id="radioIn" required>
+            <span class="check-in-btn">Check IN</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="checkType" value="Check Out" id="radioOut">
+            <span class="check-out-btn">Check OUT</span>
+          </label>
+        </div>
+
+        <label>NOTES</label>
+        <input type="text" name="notes" placeholder="Notes (Optional)">
+
+        <button type="submit" class="submit-btn">EXECUTE</button>
+      </form>
+
+      <div id="loading">
+        <div class="spinner"></div>
+        <p id="statusMsg" style="color:white; margin-top:10px;">PROCESSING...</p>
+      </div>
+
+    </div>
+
+    <script>
+      let studentDatabase = {}; // Stores {Name: Grade}
+
+      // 1. ON LOAD: Get Data, Set Time, and Start "Heartbeat"
+      window.onload = function() {
+        refreshData(); 
+        setDefaultTime();
+
+        // "Heartbeat": Ask server for updates every 30 seconds
+        setInterval(refreshData, 30000); 
+      };
+
+      // Helper function to ask server for data
+      function refreshData() {
+        google.script.run.withSuccessHandler(populateStudents).getStudentList();
+      }
+
+      // 2. Save Data from Server
+      function populateStudents(data) {
+        studentDatabase = data;
+        console.log("Database updated: " + Object.keys(data).length + " students.");
+      }
+
+      // 3. Set Default Check In/Out based on Time (4:30 PM cutoff)
+      function setDefaultTime() {
+        const now = new Date();
+        const hour = now.getHours(); 
+        const minutes = now.getMinutes();
+        
+        // 4:30 PM is 16:30
+        const isBeforeCutoff = (hour < 16) || (hour === 16 && minutes <= 30);
+
+        if (isBeforeCutoff) {
+          document.getElementById('radioIn').checked = true;
+        } else {
+          document.getElementById('radioOut').checked = true;
+        }
+      }
+
+      // 4. Auto-Fill Grade logic
+      function autoFillGrade() {
+        const name = document.getElementById('studentNameInput').value;
+        const storedGrade = studentDatabase[name];
+        
+        if (storedGrade) {
+          // Find the radio button for this grade and check it
+          const radios = document.getElementsByName('grade');
+          for (let r of radios) {
+            if (r.value == storedGrade) {
+              r.checked = true;
+            }
+          }
+        }
+      }
+
+      // 5. Handle Submit (Logic Check)
+      function handleFormSubmit(e) {
+        e.preventDefault();
+        
+        const form = document.getElementById('accessForm');
+
+        // CHECK 1: Ensure Grade is Selected
+        if (!form.grade.value) {
+          alert("ERROR: Please select your Grade.");
+          return; // Stop submission
+        }
+
+        const name = form.studentName.value;
+
+        // CHECK 2: New User Detection
+        if (!studentDatabase[name]) {
+          const confirmNew = confirm("UNRECOGNIZED STUDENT: '" + name + "'.\n\nAdd this new user to the database?");
+          if (!confirmNew) return; // Stop if they say Cancel
+        }
+        
+        const selectedGrade = form.grade.value;
+        const storedGrade = studentDatabase[name];
+
+        // LOGIC: Check for Grade Change
+        if (storedGrade && String(storedGrade) !== String(selectedGrade)) {
+          const confirmChange = confirm("ALERT:\n\nGrade changing from '" + storedGrade + "' to '" + selectedGrade + "'.\n\nIs this correct?");
+          if (!confirmChange) {
+            return; // Stop submission
+          }
+        }
+
+        // Show Loading
+        document.getElementById('loading').style.display = 'flex';
+        
+        // Send to Google Script
+        google.script.run.withSuccessHandler(afterSubmit).processForm(form);
+      }
+
+      function afterSubmit(response) {
+        // IMMEDIATE UPDATE: Fetch the new list right now
+        refreshData();
+
+        const msg = document.getElementById('statusMsg');
+        
+        if (response.type === "Check In") {
+           msg.innerHTML = "ACCESS GRANTED.<br>WELCOME BACK.";
+           msg.style.color = "var(--neon-green)";
+        } else {
+           msg.innerHTML = "SESSION ENDED.<br>SEE YOU NEXT TIME.";
+           msg.style.color = "#ff0055";
+        }
+
+        setTimeout(() => {
+          document.getElementById('accessForm').reset();
+          document.getElementById('loading').style.display = 'none';
+          setDefaultTime(); // Reset defaults
+          msg.innerHTML = "PROCESSING..."; // Reset text
+          msg.style.color = "white";
+        }, 2000); // Wait 2 seconds then reset
+      }
+
+      // --- CUSTOM DROPDOWN LOGIC ---
+
+      function showSuggestions() {
+        const input = document.getElementById('studentNameInput');
+        const list = document.getElementById('suggestions');
+        const query = input.value.toLowerCase();
+
+        // Clear the current list
+        list.innerHTML = '';
+
+        // If input is empty, hide list
+        if (query.length === 0) {
+          list.style.display = 'none';
+          return;
+        }
+      
+        const allNames = Object.keys(studentDatabase);
+
+        // Bucket 1: Starts with query (Priority)
+        const startsWith = allNames.filter(name => name.toLowerCase().startsWith(query));
+        startsWith.sort(); // Keep them alphabetical within this bucket
+      
+        // Bucket 2: Contains query, but doesn't start with it
+        const contains = allNames.filter(name => 
+          name.toLowerCase().includes(query) && !name.toLowerCase().startsWith(query)
+        );
+        contains.sort(); // Keep them alphabetical within this bucket
+      
+        // Combine them: Priority first
+        const matches = [...startsWith, ...contains];
+      
+        if (matches.length > 0) {
+          list.style.display = 'block';
+
+          matches.forEach(name => {
+            const li = document.createElement('li');
+
+            // Highlight the matching letters in Neon Green
+            const regex = new RegExp(`(${query})`, 'gi');
+            const highlightedName = name.replace(regex, '<strong>$1</strong>');
+            li.innerHTML = highlightedName;
+
+            // When clicked: fill input, hide list, auto-fill grade
+            li.onclick = () => {
+              input.value = name;
+              list.style.display = 'none';
+              autoFillGrade(); 
+            };
+
+            list.appendChild(li);
+          });
+        } else {
+          list.style.display = 'none';
+        }
+      }
+      
+      // Close the dropdown if the user clicks anywhere else on the screen
+      document.addEventListener('click', function(e) {
+        const wrapper = document.querySelector('.input-wrapper');
+        if (!wrapper.contains(e.target)) {
+          document.getElementById('suggestions').style.display = 'none';
+        }
+      });
+    </script>
+  </body>
+</html>
