@@ -13,7 +13,6 @@ function getStudentList() {
   const data = sheet.getDataRange().getValues();
   const headers = data.shift(); // Remove headers
   
-  // Create an object map: { "Adi Zaveri": 11, "John Doe": "" }
   let studentMap = {};
   data.forEach(row => {
     studentMap[row[0]] = row[1]; 
@@ -28,27 +27,25 @@ function processForm(formObject) {
   const studentSheet = ss.getSheetByName('Students');
   
   const name = formObject.studentName;
-  const grade = formObject.grade; // comes in as string "9", "10"
-  const type = formObject.checkType; // "Check In" or "Check Out"
+  const grade = formObject.grade; 
+  const type = formObject.checkType; // Passed from the button click
   const notes = formObject.notes || "";
   
+  // Use the calculated 24h time sent from frontend
+  const timeString = formObject.manualTime; 
+  
+  // Use server time for Date (assuming check-in is for "today")
   const now = new Date();
-  const timeString = Utilities.formatDate(now, Session.getScriptTimeZone(), "HH:mm:ss");
   const dateString = Utilities.formatDate(now, Session.getScriptTimeZone(), "yyyy-MM-dd");
 
   // A. UPDATE STUDENT GRADE IF NEEDED
-  // We use the 'updateGrade' flag sent from frontend, or check manually
   updateStudentGrade(name, grade, studentSheet);
 
-  // B. LOG DATA TO CORRECT TAB
-  let targetSheet;
-  if (type === "Check In") {
-    targetSheet = ss.getSheetByName('CheckIns');
-  } else {
-    targetSheet = ss.getSheetByName('CheckOuts');
-  }
+  // B. LOG DATA TO SINGLE TAB
+  const targetSheet = ss.getSheetByName('Logs');
   
-  targetSheet.appendRow([name, grade, timeString, dateString, notes]);
+  // Appends: Name, Grade, Type (In/Out), Time, Date, Notes
+  targetSheet.appendRow([name, grade, type, timeString, dateString, notes]);
   
   return { status: "SUCCESS", type: type };
 }
@@ -59,7 +56,6 @@ function updateStudentGrade(name, newGrade, sheet) {
   // Look for the student
   for (let i = 1; i < data.length; i++) {
     if (data[i][0] === name) {
-      // If grade is different or empty, update it
       if (String(data[i][1]) !== String(newGrade)) {
         sheet.getRange(i + 1, 2).setValue(newGrade);
       }
@@ -67,7 +63,5 @@ function updateStudentGrade(name, newGrade, sheet) {
     }
   }
   
-  // If student doesn't exist in DB (shouldn't happen if using dropdown, but safety check)
-  // Add them to the bottom
   sheet.appendRow([name, newGrade]);
 }

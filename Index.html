@@ -2,12 +2,13 @@
 <html>
   <head>
     <base target="_top">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;700&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
     <style>
       /* --- FUTURISTIC TECH THEME CSS --- */
       :root {
         --neon-blue: #00f3ff;
         --neon-green: #0aff60;
+        --neon-red: #ff0055;
         --dark-bg: #0b0c10;
         --panel-bg: #1f2833;
         --text-color: #c5c6c7;
@@ -51,14 +52,18 @@
 
       label {
         display: block;
-        margin-top: 20px;    /* Gap ABOVE the label (Between sections) */
-        margin-bottom: 6px; /* Gap BELOW the label (Between text and box) */
+        margin-top: 20px;
+        margin-bottom: 6px;
         font-size: 0.9rem;
         color: var(--neon-blue);
       }
 
-      /* Input Fields */
-      input[type="text"], input[type="list"] {
+      form > label:first-of-type {
+        margin-top: 0;
+      }
+
+      /* Text Inputs */
+      input[type="text"] {
         width: 100%;
         padding: 10px;
         margin-top: 0;
@@ -67,174 +72,136 @@
         border: 1px solid #45a29e;
         color: white;
         font-family: 'Roboto Mono', monospace;
-        box-sizing: border-box; /* Fixes padding issues */
+        box-sizing: border-box; 
       }
 
-      /* Removes the extra gap from the very first label so it sits tight to the title */
-      form > label:first-of-type {
-        margin-top: 0;
-      }
-
-      /* --- CUSTOM DROPDOWN STYLING --- */
-      .input-wrapper {
-        position: relative;
-        width: 100%;
-      }
-      
+      /* --- CUSTOM DROPDOWN --- */
+      .input-wrapper { position: relative; width: 100%; }
       .suggestions-list {
-        display: none; /* Hidden by default */
-        position: absolute;
-        top: 100%;
-        left: 0;
-        width: 100%;
-        max-height: 200px;
-        overflow-y: auto;
-        background-color: var(--panel-bg);
-        border: 1px solid var(--neon-blue);
-        border-top: none;
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        z-index: 1000;
+        display: none; position: absolute; top: 100%; left: 0; width: 100%;
+        max-height: 200px; overflow-y: auto; background-color: var(--panel-bg);
+        border: 1px solid var(--neon-blue); border-top: none;
+        list-style: none; padding: 0; margin: 0; z-index: 1000;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
       }
-      
-      /* Scrollbar styling for the list */
-      .suggestions-list::-webkit-scrollbar {
-        width: 8px;
-        background: var(--dark-bg);
-      }
-      .suggestions-list::-webkit-scrollbar-thumb {
-        background: var(--neon-blue);
-        border-radius: 4px;
-      }
-      
+      .suggestions-list::-webkit-scrollbar { width: 8px; background: var(--dark-bg); }
+      .suggestions-list::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
       .suggestions-list li {
-        padding: 12px;
-        border-bottom: 1px solid #333;
-        color: var(--text-color);
-        cursor: pointer;
-        transition: all 0.2s ease;
-        font-size: 0.9rem;
+        padding: 12px; border-bottom: 1px solid #333; color: var(--text-color);
+        cursor: pointer; transition: 0.2s; font-size: 0.9rem;
       }
-      
       .suggestions-list li:hover {
-        background-color: rgba(0, 243, 255, 0.1); /* Low opacity neon blue */
-        color: white;
-        padding-left: 15px; /* Slight movement effect */
-        border-left: 3px solid var(--neon-blue);
+        background-color: rgba(0, 243, 255, 0.1); color: white;
+        padding-left: 15px; border-left: 3px solid var(--neon-blue);
       }
-      
-      .suggestions-list li strong {
-        color: var(--neon-green); /* Highlight the typed letters */
+      .suggestions-list li strong { color: var(--neon-green); }
+
+      /* --- GRADE RADIO BUTTONS --- */
+      .radio-group { display: flex; justify-content: space-between; margin-top: 0; }
+      .radio-option { position: relative; cursor: pointer; }
+      .radio-option input { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; }
+      .radio-option span {
+        display: inline-block; padding: 8px 12px; border: 1px solid #45a29e;
+        color: #45a29e; transition: 0.3s; font-size: 0.8rem;
       }
-      
-      /* Grade & Radio Buttons */
-      .radio-group {
+      .radio-option input:checked + span {
+        background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-blue); font-weight: bold;
+      }
+      .radio-option input:focus + span {
+        box-shadow: 0 0 15px white, 0 0 5px var(--neon-blue); border-color: white; transform: scale(1.05);
+      }
+
+      /* --- TIME SECTION STYLING --- */
+      .time-container {
         display: flex;
         justify-content: space-between;
-        margin-top: 0;
+        gap: 10px;
       }
-      
-      .radio-option {
-        position: relative;
-        cursor: pointer;
-      }
-      
-      .radio-option input {
-        /* We use opacity 0 instead of display: none so Tabbing still works */
-        opacity: 0;
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        cursor: pointer;
-      }
-      
-      /* Accessibility: Show a white glow when Tabbing */
-      .radio-option input:focus + span {
-        box-shadow: 0 0 15px white, 0 0 5px var(--neon-blue);
-        border-color: white;
-        transform: scale(1.05); /* Slight zoom to show active state */
-      }
-
-      .radio-option span {
-        display: inline-block;
-        padding: 8px 12px;
+      .time-box {
+        background: #0b0c10;
         border: 1px solid #45a29e;
-        color: #45a29e;
-        transition: 0.3s;
-        font-size: 0.8rem;
-      }
-      
-      .radio-option input:checked + span {
-        background: var(--neon-blue);
-        color: #000;
-        box-shadow: 0 0 10px var(--neon-blue);
-        font-weight: bold;
-      }
-
-      /* Check In/Out Specific Styling */
-      .action-group .radio-option input:checked + span.check-in-btn {
-        background: var(--neon-green);
-        box-shadow: 0 0 10px var(--neon-green);
-      }
-      
-      .action-group .radio-option input:checked + span.check-out-btn {
-        background: #ff0055;
-        box-shadow: 0 0 10px #ff0055;
         color: white;
-      }
-
-      button.submit-btn {
+        font-family: 'Exo 2', sans-serif; /* <--- NEW FONT */
+        font-weight: 700;
+        font-size: 1.5rem; /* Slightly larger for better visibility */
+        padding: 10px;
+        text-align: center;
         width: 100%;
-        margin-top: 25px;
-        padding: 12px;
-        background: transparent;
-        border: 2px solid var(--neon-blue);
-        color: var(--neon-blue);
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1.1rem;
-        cursor: pointer;
-        transition: 0.3s;
-        text-transform: uppercase;
+      }
+      .time-box:focus {
+        outline: none; border-color: var(--neon-green);
+        box-shadow: 0 0 8px rgba(10, 255, 96, 0.5);
+      }
+      /* Styling for when time is auto-syncing */
+      .time-box.auto-sync {
+      color: #888 !important; /* Grey text */
+      opacity: 0.7;
       }
 
-      button.submit-btn:hover {
-        background: var(--neon-blue);
-        color: #000;
-        box-shadow: 0 0 20px var(--neon-blue);
+      /* Ensure manual input is bright white */
+      .time-box {
+      transition: color 0.3s, opacity 0.3s;
+      }
+      /* Hide arrows on number input */
+      input[type=number]::-webkit-inner-spin-button, 
+      input[type=number]::-webkit-outer-spin-button { 
+        -webkit-appearance: none; margin: 0; 
       }
       
-      /* Loading Overlay */
-      #loading {
-        display: none;
-        position: absolute;
-        top:0; left:0; width:100%; height:100%;
-        background: rgba(0,0,0,0.9);
-        justify-content: center;
-        align-items: center;
-        flex-direction: column;
-        z-index: 10;
-        border-radius: 10px;
+      /* --- DUAL BUTTONS --- */
+      .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
       }
-
-      /* Status Message Text */
-      #statusMsg {
-        text-align: center; /* This forces the text to be centered */
-        width: 100%;        /* Ensures it spans the full width of the container */
-        margin-top: 15px;
-        color: white;
+      
+      .action-btn {
+        flex: 1;
+        padding: 15px;
         font-family: 'Orbitron', sans-serif;
-        line-height: 1.5;
+        font-size: 1rem;
+        font-weight: bold;
+        cursor: pointer;
+        text-transform: uppercase;
+        background: transparent;
+        transition: 0.3s;
       }
 
+      /* Check In (Green) */
+      .btn-in {
+        border: 2px solid var(--neon-green);
+        color: var(--neon-green);
+      }
+      .btn-in:hover, .btn-in:focus {
+        background: var(--neon-green);
+        color: #000;
+        box-shadow: 0 0 20px var(--neon-green);
+      }
+
+      /* Check Out (Red) */
+      .btn-out {
+        border: 2px solid var(--neon-red);
+        color: var(--neon-red);
+      }
+      .btn-out:hover, .btn-out:focus {
+        background: var(--neon-red);
+        color: white;
+        box-shadow: 0 0 20px var(--neon-red);
+      }
+
+      /* Loading & Status */
+      #loading {
+        display: none; position: absolute; top:0; left:0; width:100%; height:100%;
+        background: rgba(0,0,0,0.9); justify-content: center; align-items: center;
+        flex-direction: column; z-index: 10; border-radius: 10px;
+      }
+      #statusMsg {
+        text-align: center; width: 100%; margin-top: 15px; color: white;
+        font-family: 'Orbitron', sans-serif; line-height: 1.5;
+      }
       .spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--neon-blue);
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
+        border: 4px solid #f3f3f3; border-top: 4px solid var(--neon-blue);
+        border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite;
       }
       @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
@@ -245,14 +212,16 @@
     <div class="container">
       <h1>FRC Check In/Out</h1>
       
-      <form id="accessForm" onsubmit="handleFormSubmit(event)">
+      <form id="accessForm">
         
+        <input type="hidden" name="checkType" id="hiddenCheckType">
+        <input type="hidden" name="manualTime" id="hiddenManualTime">
+
         <label>STUDENT NAME</label>
         <div class="input-wrapper">
           <input type="text" name="studentName" id="studentNameInput" 
                  placeholder="Begin typing name..." required autocomplete="off" 
                  oninput="showSuggestions()" onfocus="showSuggestions()">
-
           <ul id="suggestions" class="suggestions-list"></ul>
         </div>
 
@@ -264,22 +233,24 @@
           <label class="radio-option"><input type="radio" name="grade" value="12"><span>12</span></label>
         </div>
 
-        <label>OPERATION</label>
-        <div class="radio-group action-group">
-          <label class="radio-option">
-            <input type="radio" name="checkType" value="Check In" id="radioIn" required>
-            <span class="check-in-btn">Check IN</span>
-          </label>
-          <label class="radio-option">
-            <input type="radio" name="checkType" value="Check Out" id="radioOut">
-            <span class="check-out-btn">Check OUT</span>
-          </label>
+        <label>TIME</label>
+        <div class="time-container">
+          <input type="number" id="timeHour" class="time-box" min="1" max="12" placeholder="HH" onfocus="stopClock()">
+          <input type="number" id="timeMin" class="time-box" min="0" max="59" placeholder="MM" onfocus="stopClock()">
+          <select id="timeAmPm" class="time-box" onfocus="stopClock()" style="cursor: pointer;">
+            <option value="AM">AM</option>
+            <option value="PM">PM</option>
+          </select>
         </div>
 
         <label>NOTES</label>
         <input type="text" name="notes" placeholder="Notes (Optional)">
 
-        <button type="submit" class="submit-btn">EXECUTE</button>
+        <div class="button-group">
+          <button type="button" class="action-btn btn-in" onclick="triggerSubmit('Check In')">CHECK IN</button>
+          <button type="button" class="action-btn btn-out" onclick="triggerSubmit('Check Out')">CHECK OUT</button>
+        </div>
+
       </form>
 
       <div id="loading">
@@ -290,102 +261,168 @@
     </div>
 
     <script>
-      let studentDatabase = {}; // Stores {Name: Grade}
+      let studentDatabase = {}; 
+      let isTimeEdited = false; // Flag to stop auto-update if user types
+      let clockInterval;
 
-      // 1. ON LOAD: Get Data, Set Time, and Start "Heartbeat"
       window.onload = function() {
         refreshData(); 
-        setDefaultTime();
-
-        // "Heartbeat": Ask server for updates every 30 seconds
+        startClock(); // Start the live clock
         setInterval(refreshData, 30000); 
       };
 
-      // Helper function to ask server for data
       function refreshData() {
         google.script.run.withSuccessHandler(populateStudents).getStudentList();
       }
 
-      // 2. Save Data from Server
       function populateStudents(data) {
         studentDatabase = data;
         console.log("Database updated: " + Object.keys(data).length + " students.");
       }
 
-      // 3. Set Default Check In/Out based on Time (4:30 PM cutoff)
-      function setDefaultTime() {
-        const now = new Date();
-        const hour = now.getHours(); 
-        const minutes = now.getMinutes();
-        
-        // 4:30 PM is 16:30
-        const isBeforeCutoff = (hour < 16) || (hour === 16 && minutes <= 30);
+      // --- CLOCK LOGIC ---
+      // --- CLOCK & INACTIVITY LOGIC ---
+      let inactivityTimer;
 
-        if (isBeforeCutoff) {
-          document.getElementById('radioIn').checked = true;
-        } else {
-          document.getElementById('radioOut').checked = true;
+      function startClock() {
+        updateTimeUI(); 
+        clockInterval = setInterval(updateTimeUI, 1000); 
+
+        // Listen for activity to reset the timer
+        document.onmousemove = resetInactivityTimer;
+        document.onkeypress = resetInactivityTimer;
+        document.onclick = resetInactivityTimer;
+      }
+
+      function updateTimeUI() {
+        if (isTimeEdited) return; 
+
+        // Apply Grey Styling (Auto-Sync Mode)
+        const hourBox = document.getElementById('timeHour');
+        const minBox = document.getElementById('timeMin');
+        const ampmBox = document.getElementById('timeAmPm');
+        
+        if (!hourBox.classList.contains('auto-sync')) {
+          hourBox.classList.add('auto-sync');
+          minBox.classList.add('auto-sync');
+          ampmBox.classList.add('auto-sync');
+        }
+
+        const now = new Date();
+        let hours = now.getHours();
+        const minutes = now.getMinutes();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+
+        hours = hours % 12;
+        hours = hours ? hours : 12; 
+        
+        const minStr = minutes < 10 ? '0' + minutes : minutes;
+
+        hourBox.value = hours;
+        minBox.value = minStr;
+        ampmBox.value = ampm;
+      }
+
+      // If user is idle for 60 seconds, re-sync to current time
+      function resetInactivityTimer() {
+        clearTimeout(inactivityTimer);
+        // Only set the timer if the user has actually edited the time
+        if (isTimeEdited) {
+          inactivityTimer = setTimeout(reSyncClock, 60000); // 60,000 ms = 1 minute
         }
       }
 
-      // 4. Auto-Fill Grade logic
+      function reSyncClock() {
+        isTimeEdited = false; // Allow auto-update again
+        updateTimeUI(); // Force immediate update
+        console.log("Inactivity detected: Clock re-synced.");
+      }
+
+      // Stop the clock if user clicks into any time field
+      // Stop the clock and turn text white if user interacts
+      function stopClock() {
+        isTimeEdited = true;
+        
+        // Remove the grey styling
+        document.getElementById('timeHour').classList.remove('auto-sync');
+        document.getElementById('timeMin').classList.remove('auto-sync');
+        document.getElementById('timeAmPm').classList.remove('auto-sync');
+        
+        resetInactivityTimer(); // Restart the 60s countdown
+      }
+
       function autoFillGrade() {
         const name = document.getElementById('studentNameInput').value;
         const storedGrade = studentDatabase[name];
-        
         if (storedGrade) {
-          // Find the radio button for this grade and check it
           const radios = document.getElementsByName('grade');
           for (let r of radios) {
-            if (r.value == storedGrade) {
-              r.checked = true;
-            }
+            if (r.value == storedGrade) r.checked = true;
           }
         }
       }
 
-      // 5. Handle Submit (Logic Check)
-      function handleFormSubmit(e) {
-        e.preventDefault();
-        
+      // --- SUBMIT HANDLING ---
+      
+      function triggerSubmit(type) {
         const form = document.getElementById('accessForm');
+        
+        // 1. Set Hidden Type Field
+        document.getElementById('hiddenCheckType').value = type;
 
-        // CHECK 1: Ensure Grade is Selected
+        // 2. Validate Inputs
         if (!form.grade.value) {
           alert("ERROR: Please select your Grade.");
-          return; // Stop submission
+          return;
         }
 
         const name = form.studentName.value;
+        if (!name) {
+          alert("ERROR: Please enter a name.");
+          return;
+        }
 
-        // CHECK 2: New User Detection
         if (!studentDatabase[name]) {
           const confirmNew = confirm("UNRECOGNIZED STUDENT: '" + name + "'.\n\nAdd this new user to the database?");
-          if (!confirmNew) return; // Stop if they say Cancel
+          if (!confirmNew) return;
         }
         
         const selectedGrade = form.grade.value;
         const storedGrade = studentDatabase[name];
 
-        // LOGIC: Check for Grade Change
         if (storedGrade && String(storedGrade) !== String(selectedGrade)) {
           const confirmChange = confirm("ALERT:\n\nGrade changing from '" + storedGrade + "' to '" + selectedGrade + "'.\n\nIs this correct?");
-          if (!confirmChange) {
-            return; // Stop submission
-          }
+          if (!confirmChange) return;
         }
 
-        // Show Loading
-        document.getElementById('loading').style.display = 'flex';
+        // 3. Process Time to Backend Format (24h)
+        const hh = parseInt(document.getElementById('timeHour').value);
+        const mm = parseInt(document.getElementById('timeMin').value);
+        const ampm = document.getElementById('timeAmPm').value;
         
-        // Send to Google Script
+        if (isNaN(hh) || isNaN(mm) || hh < 1 || hh > 12 || mm < 0 || mm > 59) {
+           alert("Invalid Time Entered.");
+           return;
+        }
+
+        // Convert to 24h string
+        let hours24 = hh;
+        if (ampm === "PM" && hh < 12) hours24 = hh + 12;
+        if (ampm === "AM" && hh === 12) hours24 = 0;
+        
+        const mmStr = mm < 10 ? '0' + mm : mm;
+        const hhStr = hours24 < 10 ? '0' + hours24 : hours24;
+        
+        const finalTimeStr = hhStr + ":" + mmStr;
+        document.getElementById('hiddenManualTime').value = finalTimeStr;
+
+        // 4. Send to Backend
+        document.getElementById('loading').style.display = 'flex';
         google.script.run.withSuccessHandler(afterSubmit).processForm(form);
       }
 
       function afterSubmit(response) {
-        // IMMEDIATE UPDATE: Fetch the new list right now
         refreshData();
-
         const msg = document.getElementById('statusMsg');
         
         if (response.type === "Check In") {
@@ -399,61 +436,44 @@
         setTimeout(() => {
           document.getElementById('accessForm').reset();
           document.getElementById('loading').style.display = 'none';
-          setDefaultTime(); // Reset defaults
-          msg.innerHTML = "PROCESSING..."; // Reset text
+          msg.innerHTML = "PROCESSING..."; 
           msg.style.color = "white";
-        }, 2000); // Wait 2 seconds then reset
+          
+          // Restart the live clock for the next user
+          isTimeEdited = false;
+          updateTimeUI(); 
+        }, 2000); 
       }
 
-      // --- CUSTOM DROPDOWN LOGIC ---
-
+      // --- DROPDOWN LOGIC (UNCHANGED) ---
       function showSuggestions() {
         const input = document.getElementById('studentNameInput');
         const list = document.getElementById('suggestions');
         const query = input.value.toLowerCase();
-
-        // Clear the current list
         list.innerHTML = '';
-
-        // If input is empty, hide list
-        if (query.length === 0) {
-          list.style.display = 'none';
-          return;
-        }
+        if (query.length === 0) { list.style.display = 'none'; return; }
       
         const allNames = Object.keys(studentDatabase);
-
-        // Bucket 1: Starts with query (Priority)
         const startsWith = allNames.filter(name => name.toLowerCase().startsWith(query));
-        startsWith.sort(); // Keep them alphabetical within this bucket
-      
-        // Bucket 2: Contains query, but doesn't start with it
+        startsWith.sort();
         const contains = allNames.filter(name => 
           name.toLowerCase().includes(query) && !name.toLowerCase().startsWith(query)
         );
-        contains.sort(); // Keep them alphabetical within this bucket
-      
-        // Combine them: Priority first
+        contains.sort();
         const matches = [...startsWith, ...contains];
       
         if (matches.length > 0) {
           list.style.display = 'block';
-
           matches.forEach(name => {
             const li = document.createElement('li');
-
-            // Highlight the matching letters in Neon Green
             const regex = new RegExp(`(${query})`, 'gi');
             const highlightedName = name.replace(regex, '<strong>$1</strong>');
             li.innerHTML = highlightedName;
-
-            // When clicked: fill input, hide list, auto-fill grade
             li.onclick = () => {
               input.value = name;
               list.style.display = 'none';
               autoFillGrade(); 
             };
-
             list.appendChild(li);
           });
         } else {
@@ -461,7 +481,6 @@
         }
       }
       
-      // Close the dropdown if the user clicks anywhere else on the screen
       document.addEventListener('click', function(e) {
         const wrapper = document.querySelector('.input-wrapper');
         if (!wrapper.contains(e.target)) {
