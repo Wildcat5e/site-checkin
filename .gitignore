@@ -1,0 +1,19 @@
+# Clasp configuration
+.clasp.json
+
+# Node modules
+node_modules/
+npm-debug.log
+package-lock.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+
+# Windows OS files
+Thumbs.db
+desktop.ini

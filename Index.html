@@ -1,265 +1,121 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <base target="_top">
-    <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;700&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap" rel="stylesheet">
-    <style>
-      /* --- FUTURISTIC TECH THEME CSS --- */
-      :root {
-        --neon-blue: #00f3ff;
-        --neon-green: #0aff60;
-        --neon-red: #ff0055;
-        --dark-bg: #0b0c10;
-        --panel-bg: #1f2833;
-        --text-color: #c5c6c7;
-      }
+    <base target="_top" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;700&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap"
+      rel="stylesheet"
+    />
 
-      body {
-        background-color: var(--dark-bg);
-        color: var(--text-color);
-        font-family: 'Roboto Mono', monospace;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        background-image: 
-          linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-        background-size: 20px 20px;
-      }
-
-      .container {
-        background-color: var(--panel-bg);
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-        border: 1px solid var(--neon-blue);
-        width: 100%;
-        max-width: 400px;
-        position: relative;
-      }
-
-      h1 {
-        font-family: 'Orbitron', sans-serif;
-        color: var(--neon-blue);
-        text-align: center;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        margin-bottom: 2.5rem;
-        text-shadow: 0 0 10px var(--neon-blue);
-      }
-
-      label {
-        display: block;
-        margin-top: 20px;
-        margin-bottom: 6px;
-        font-size: 0.9rem;
-        color: var(--neon-blue);
-      }
-
-      form > label:first-of-type {
-        margin-top: 0;
-      }
-
-      /* Text Inputs */
-      input[type="text"] {
-        width: 100%;
-        padding: 10px;
-        margin-top: 0;
-        margin-bottom: 5px;
-        background: #0b0c10;
-        border: 1px solid #45a29e;
-        color: white;
-        font-family: 'Roboto Mono', monospace;
-        box-sizing: border-box; 
-      }
-
-      /* --- CUSTOM DROPDOWN --- */
-      .input-wrapper { position: relative; width: 100%; }
-      .suggestions-list {
-        display: none; position: absolute; top: 100%; left: 0; width: 100%;
-        max-height: 200px; overflow-y: auto; background-color: var(--panel-bg);
-        border: 1px solid var(--neon-blue); border-top: none;
-        list-style: none; padding: 0; margin: 0; z-index: 1000;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8);
-      }
-      .suggestions-list::-webkit-scrollbar { width: 8px; background: var(--dark-bg); }
-      .suggestions-list::-webkit-scrollbar-thumb { background: var(--neon-blue); border-radius: 4px; }
-      .suggestions-list li {
-        padding: 12px; border-bottom: 1px solid #333; color: var(--text-color);
-        cursor: pointer; transition: 0.2s; font-size: 0.9rem;
-      }
-      .suggestions-list li:hover {
-        background-color: rgba(0, 243, 255, 0.1); color: white;
-        padding-left: 15px; border-left: 3px solid var(--neon-blue);
-      }
-      .suggestions-list li strong { color: var(--neon-green); }
-
-      /* --- GRADE RADIO BUTTONS --- */
-      .radio-group { display: flex; justify-content: space-between; margin-top: 0; }
-      .radio-option { position: relative; cursor: pointer; }
-      .radio-option input { opacity: 0; position: absolute; width: 100%; height: 100%; cursor: pointer; }
-      .radio-option span {
-        display: inline-block; padding: 8px 12px; border: 1px solid #45a29e;
-        color: #45a29e; transition: 0.3s; font-size: 0.8rem;
-      }
-      .radio-option input:checked + span {
-        background: var(--neon-blue); color: #000; box-shadow: 0 0 10px var(--neon-blue); font-weight: bold;
-      }
-      .radio-option input:focus + span {
-        box-shadow: 0 0 15px white, 0 0 5px var(--neon-blue); border-color: white; transform: scale(1.05);
-      }
-
-      /* --- TIME SECTION STYLING --- */
-      .time-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
-      }
-      .time-box {
-        background: #0b0c10;
-        border: 1px solid #45a29e;
-        color: white;
-        font-family: 'Exo 2', sans-serif; /* <--- NEW FONT */
-        font-weight: 700;
-        font-size: 1.5rem; /* Slightly larger for better visibility */
-        padding: 10px;
-        text-align: center;
-        width: 100%;
-      }
-      .time-box:focus {
-        outline: none; border-color: var(--neon-green);
-        box-shadow: 0 0 8px rgba(10, 255, 96, 0.5);
-      }
-      /* Styling for when time is auto-syncing */
-      .time-box.auto-sync {
-      color: #888 !important; /* Grey text */
-      opacity: 0.7;
-      }
-
-      /* Ensure manual input is bright white */
-      .time-box {
-      transition: color 0.3s, opacity 0.3s;
-      }
-      /* Hide arrows on number input */
-      input[type=number]::-webkit-inner-spin-button, 
-      input[type=number]::-webkit-outer-spin-button { 
-        -webkit-appearance: none; margin: 0; 
-      }
-      
-      /* --- DUAL BUTTONS --- */
-      .button-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 25px;
-      }
-      
-      .action-btn {
-        flex: 1;
-        padding: 15px;
-        font-family: 'Orbitron', sans-serif;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        text-transform: uppercase;
-        background: transparent;
-        transition: 0.3s;
-      }
-
-      /* Check In (Green) */
-      .btn-in {
-        border: 2px solid var(--neon-green);
-        color: var(--neon-green);
-      }
-      .btn-in:hover, .btn-in:focus {
-        background: var(--neon-green);
-        color: #000;
-        box-shadow: 0 0 20px var(--neon-green);
-      }
-
-      /* Check Out (Red) */
-      .btn-out {
-        border: 2px solid var(--neon-red);
-        color: var(--neon-red);
-      }
-      .btn-out:hover, .btn-out:focus {
-        background: var(--neon-red);
-        color: white;
-        box-shadow: 0 0 20px var(--neon-red);
-      }
-
-      /* Loading & Status */
-      #loading {
-        display: none; position: absolute; top:0; left:0; width:100%; height:100%;
-        background: rgba(0,0,0,0.9); justify-content: center; align-items: center;
-        flex-direction: column; z-index: 10; border-radius: 10px;
-      }
-      #statusMsg {
-        text-align: center; width: 100%; margin-top: 15px; color: white;
-        font-family: 'Orbitron', sans-serif; line-height: 1.5;
-      }
-      .spinner {
-        border: 4px solid #f3f3f3; border-top: 4px solid var(--neon-blue);
-        border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite;
-      }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-    </style>
+    <!-- Inject CSS here -->
+    <?!= include('Stylesheet'); ?>
   </head>
   <body>
-
     <div class="container">
       <h1>FRC Check In/Out</h1>
-      
+
       <form id="accessForm">
-        
-        <input type="hidden" name="checkType" id="hiddenCheckType">
-        <input type="hidden" name="manualTime" id="hiddenManualTime">
+        <input type="hidden" name="checkType" id="hiddenCheckType" />
+        <input type="hidden" name="manualTime" id="hiddenManualTime" />
 
         <label>STUDENT NAME</label>
         <div class="input-wrapper">
-          <input type="text" name="studentName" id="studentNameInput" 
-                 placeholder="Begin typing name..." required autocomplete="off" 
-                 oninput="showSuggestions()" onfocus="showSuggestions()">
+          <input
+            type="text"
+            name="studentName"
+            id="studentNameInput"
+            placeholder="Begin typing name..."
+            required
+            autocomplete="off"
+            oninput="showSuggestions()"
+            onfocus="showSuggestions()"
+          />
           <ul id="suggestions" class="suggestions-list"></ul>
         </div>
 
         <label>GRADE</label>
         <div class="radio-group">
-          <label class="radio-option"><input type="radio" name="grade" value="9" ><span>09</span></label>
-          <label class="radio-option"><input type="radio" name="grade" value="10"><span>10</span></label>
-          <label class="radio-option"><input type="radio" name="grade" value="11"><span>11</span></label>
-          <label class="radio-option"><input type="radio" name="grade" value="12"><span>12</span></label>
+          <label class="radio-option"
+            ><input type="radio" name="grade" value="9" /><span>09</span></label
+          >
+          <label class="radio-option"
+            ><input type="radio" name="grade" value="10" /><span
+              >10</span
+            ></label
+          >
+          <label class="radio-option"
+            ><input type="radio" name="grade" value="11" /><span
+              >11</span
+            ></label
+          >
+          <label class="radio-option"
+            ><input type="radio" name="grade" value="12" /><span
+              >12</span
+            ></label
+          >
         </div>
 
         <label>TIME</label>
         <div class="time-container">
-          <input type="number" id="timeHour" class="time-box" min="1" max="12" placeholder="HH" onfocus="stopClock()">
-          <input type="number" id="timeMin" class="time-box" min="0" max="59" placeholder="MM" onfocus="stopClock()">
-          <select id="timeAmPm" class="time-box" onfocus="stopClock()" style="cursor: pointer;">
+          <input
+            type="number"
+            id="timeHour"
+            class="time-box"
+            min="1"
+            max="12"
+            placeholder="HH"
+            onfocus="stopClock()"
+          />
+          <input
+            type="number"
+            id="timeMin"
+            class="time-box"
+            min="0"
+            max="59"
+            placeholder="MM"
+            onfocus="stopClock()"
+          />
+          <select
+            id="timeAmPm"
+            class="time-box"
+            onfocus="stopClock()"
+            style="cursor: pointer"
+          >
             <option value="AM">AM</option>
             <option value="PM">PM</option>
           </select>
         </div>
 
         <label>NOTES</label>
-        <input type="text" name="notes" placeholder="Notes (Optional)">
+        <input type="text" name="notes" placeholder="Notes (Optional)" />
 
         <div class="button-group">
-          <button type="button" class="action-btn btn-in" onclick="triggerSubmit('Check In')">CHECK IN</button>
-          <button type="button" class="action-btn btn-out" onclick="triggerSubmit('Check Out')">CHECK OUT</button>
+          <button
+            type="button"
+            class="action-btn btn-in"
+            onclick="triggerSubmit('Check In')"
+          >
+            CHECK IN
+          </button>
+          <button
+            type="button"
+            class="action-btn btn-out"
+            onclick="triggerSubmit('Check Out')"
+          >
+            CHECK OUT
+          </button>
         </div>
-
       </form>
 
       <div id="loading">
         <div class="spinner"></div>
-        <p id="statusMsg" style="color:white; margin-top:10px;">PROCESSING...</p>
+        <p id="statusMsg" style="color: white; margin-top: 10px">
+          PROCESSING...
+        </p>
       </div>
-
     </div>
 
-    <?!= includeJS() ?>
+    <!-- Inject JavaScript here -->
+    <?!= include('JavaScript'); ?>
   </body>
 </html>
