@@ -14,23 +14,8 @@
     }
 
     function populateStudents(data) {
-        // data: { normName: grade }
-        // Build a map: normName -> { displayName, grade }
-        studentDatabase = {};
-        // Build a reverse map for display names
-        for (const normName in data) {
-            // Try to recover display name from the sheet by capitalizing each word
-            // (since backend only sends normalized names)
-            // But ideally, backend should send display names too. For now, guess:
-            const displayName = normName
-                .split(" ")
-                .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-                .join(" ");
-            studentDatabase[normName] = {
-                displayName: displayName,
-                grade: data[normName],
-            };
-        }
+        // data: { normName: { displayName: "Exact Sheet Name", grade: "10" } }
+        studentDatabase = data;
     }
 
     // Clock and Inactivity Logic
@@ -151,8 +136,36 @@
         document.getElementById("customPopup").style.display = "none";
     }
 
-    // Submit Handling
+    function set24HourTime() {
+        const hh = parseInt(document.getElementById("timeHour").value);
+        const mm = parseInt(document.getElementById("timeMin").value);
+        const ampm = document.getElementById("timeAmPm").value;
 
+        if (isNaN(hh) || isNaN(mm) || hh < 1 || hh > 12 || mm < 0 || mm > 59) {
+            showCustomPopup({
+                title: "ERROR",
+                message: "Invalid Time Entered.",
+                buttons: [
+                    { text: "OK" }
+                ]
+            });
+            return false;
+        }
+
+        // Convert to 24h string
+        let hours24 = hh;
+        if (ampm === "PM" && hh < 12) hours24 = hh + 12;
+        if (ampm === "AM" && hh === 12) hours24 = 0;
+
+        const mmStr = mm < 10 ? "0" + mm : mm;
+        const hhStr = hours24 < 10 ? "0" + hours24 : hours24;
+
+        const finalTimeStr = hhStr + ":" + mmStr;
+        document.getElementById("hiddenManualTime").value = finalTimeStr;
+        return true;
+    }
+
+    // Submit Handling
     function triggerSubmit(type) {
         const form = document.getElementById("accessForm");
 
@@ -208,32 +221,7 @@
             return;
         }
 
-        // Convert Time to backend format (24h)
-        const hh = parseInt(document.getElementById("timeHour").value);
-        const mm = parseInt(document.getElementById("timeMin").value);
-        const ampm = document.getElementById("timeAmPm").value;
-
-        if (isNaN(hh) || isNaN(mm) || hh < 1 || hh > 12 || mm < 0 || mm > 59) {
-            showCustomPopup({
-                title: "ERROR",
-                message: "Invalid Time Entered.",
-                buttons: [
-                    { text: "OK" }
-                ]
-            });
-            return;
-        }
-
-        // Convert to 24h string
-        let hours24 = hh;
-        if (ampm === "PM" && hh < 12) hours24 = hh + 12;
-        if (ampm === "AM" && hh === 12) hours24 = 0;
-
-        const mmStr = mm < 10 ? "0" + mm : mm;
-        const hhStr = hours24 < 10 ? "0" + hours24 : hours24;
-
-        const finalTimeStr = hhStr + ":" + mmStr;
-        document.getElementById("hiddenManualTime").value = finalTimeStr;
+        if (!set24HourTime()) return;
 
         // Send to backend
         document.getElementById("loading").style.display = "flex";
@@ -242,20 +230,7 @@
 
     // Helper for custom confirm logic
     function actuallySubmit(type, form, normName, name) {
-        // Process Time to backend format (24h)
-        const hh = parseInt(document.getElementById("timeHour").value);
-        const mm = parseInt(document.getElementById("timeMin").value);
-        const ampm = document.getElementById("timeAmPm").value;
-
-        let hours24 = hh;
-        if (ampm === "PM" && hh < 12) hours24 = hh + 12;
-        if (ampm === "AM" && hh === 12) hours24 = 0;
-
-        const mmStr = mm < 10 ? "0" + mm : mm;
-        const hhStr = hours24 < 10 ? "0" + hours24 : hours24;
-
-        const finalTimeStr = hhStr + ":" + mmStr;
-        document.getElementById("hiddenManualTime").value = finalTimeStr;
+        set24HourTime();
 
         document.getElementById("loading").style.display = "flex";
         google.script.run.withSuccessHandler(afterSubmit).processForm(form);

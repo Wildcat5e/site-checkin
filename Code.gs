@@ -24,12 +24,17 @@ function getStudentList() {
   // Remove headers
   if (data.length > 0) data.shift();
   let studentMap = {};
+
   data.forEach((row) => {
     // Name is Col A (index 0), Grade is Col B (index 1)
     if (row[0]) {
-      // Normalize Name for case/whitespace
-      const normName = String(row[0]).trim().toLowerCase();
-      studentMap[normName] = row[1];
+      const displayName = String(row[0]).trim();
+      const normName = displayName.toLowerCase();
+      
+      studentMap[normName] = {
+        displayName: displayName,
+        grade: row[1]
+      };
     }
   });
   
