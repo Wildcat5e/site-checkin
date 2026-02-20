@@ -87,6 +87,98 @@
         resetInactivityTimer(); // Restart the 60s countdown
     }
 
+    let isNewStudentMode = false;
+
+    function updateNameIndicator() {
+        const input = document.getElementById("studentNameInput").value.trim();
+        const normName = input.toLowerCase();
+        const indicator = document.getElementById("nameIndicator");
+
+        if (input === "") {
+            indicator.innerText = "[ ? ]";
+            indicator.className = "name-indicator indicator-unknown";
+        } else if (studentDatabase[normName]) {
+            // Prioritize existing students: Shows green even if in new student mode
+            indicator.innerText = "[ OK ]";
+            indicator.className = "name-indicator indicator-known";
+        } else if (isNewStudentMode) {
+            indicator.innerText = "[ + ]";
+            indicator.className = "name-indicator indicator-new";
+        } else {
+            indicator.innerText = "[ ? ]";
+            indicator.className = "name-indicator indicator-unknown";
+        }
+    }
+
+    function showNewStudentPopup() {
+        document.getElementById("newStudentPopup").style.display = "flex";
+    }
+
+    function closeNewStudentPopup() {
+        document.getElementById("newStudentPopup").style.display = "none";
+    }
+
+    function confirmNewStudent() {
+        isNewStudentMode = true;
+        closeNewStudentPopup();
+        updateNameIndicator();
+
+        // Unlock the grade radio buttons
+        const radios = document.getElementsByName("grade");
+        for (let r of radios) {
+            r.disabled = false;
+            r.nextElementSibling.style.cursor = "pointer";
+        }
+    }
+
+    function handleHelpLinkClick() {
+        if (isNewStudentMode) {
+            revertToNormalMode();
+        } else {
+            showNewStudentPopup();
+        }
+    }
+
+    function confirmNewStudent() {
+        isNewStudentMode = true;
+        closeNewStudentPopup();
+
+        // Clear the text box
+        document.getElementById("studentNameInput").value = "";
+        updateNameIndicator();
+
+        // Toggle the help link text and color
+        const toggleLink = document.getElementById("modeToggleLink");
+        toggleLink.innerText = "Wait! I'm a returning student!";
+        toggleLink.classList.add("link-orange");
+
+        // Unlock the grade radio buttons (CSS automatically removes grey stripes)
+        const radios = document.getElementsByName("grade");
+        for (let r of radios) {
+            r.disabled = false;
+        }
+    }
+
+    function revertToNormalMode() {
+        isNewStudentMode = false;
+
+        // Clear the text box 
+        document.getElementById("studentNameInput").value = "";
+        updateNameIndicator();
+
+        // Revert link text and color
+        const toggleLink = document.getElementById("modeToggleLink");
+        toggleLink.innerText = "First time here?";
+        toggleLink.classList.remove("link-orange");
+
+        // Re-lock the grade radio buttons and clear selections
+        const radios = document.getElementsByName("grade");
+        for (let r of radios) {
+            r.disabled = true;
+            r.checked = false;
+        }
+    }
+
     function autoFillGrade() {
         const name = document.getElementById("studentNameInput").value;
         const normName = name.trim().toLowerCase();
@@ -104,6 +196,8 @@
                 r.checked = false;
             }
         }
+
+        updateNameIndicator();
     }
 
     // Grade Help Tooltip Logic
@@ -123,7 +217,7 @@
         buttons.forEach(btn => {
             const button = document.createElement('button');
             button.innerText = btn.text;
-            button.className = btn.className || 'close-grade-help';
+            button.className = btn.className || 'popup-btn-default';
             button.onclick = function () {
                 closeCustomPopup();
                 if (btn.onClick) btn.onClick();
@@ -186,6 +280,20 @@
 
         const name = form.studentName.value;
         const normName = name.trim().toLowerCase();
+
+        if (isNewStudentMode && !studentDatabase[normName]) {
+            const selectedGrade = form.grade.value;
+            showCustomPopup({
+                title: "Confirm Registration",
+                message: "Please review your information:<br><br>Name: <span style='color:#ff9d00'>" + name + "</span><br>Grade: <span style='color:#ff9d00'>" + selectedGrade + "</span><br><br>Are you sure?",
+                buttons: [
+                    { text: "NO, EDIT", className: "action-btn btn-red", onClick: () => { } },
+                    { text: "YES!", className: "action-btn btn-green", onClick: () => actuallySubmit(type, form, normName, name) }
+                ]
+            });
+            return;
+        }
+
         if (!name) {
             showCustomPopup({
                 title: "ERROR",
@@ -248,7 +356,9 @@
             document.getElementById("loading").style.display = "none";
             msg.innerHTML = "PROCESSING...";
             msg.style.color = "white";
-            // Restart the live clock for the next user
+
+            revertToNormalMode();
+
             isTimeEdited = false;
             updateTimeUI();
         }, 2000);

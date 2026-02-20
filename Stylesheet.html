@@ -84,6 +84,56 @@
         width: 100%;
     }
 
+    /* Name Indicator Styles */
+    #studentNameInput {
+        padding-right: 60px;
+        /* Prevent text from hiding behind the icon */
+    }
+
+    .name-indicator {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        margin-top: -3px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        pointer-events: none;
+        transition: color 0.3s, transform 0.3s;
+        letter-spacing: 2px;
+    }
+
+    .indicator-unknown {
+        color: #888;
+    }
+
+    .indicator-known {
+        color: var(--neon-green);
+        text-shadow: 0 0 8px rgba(10, 255, 96, 0.4);
+    }
+
+    .indicator-new {
+        color: #ff9d00;
+        text-shadow: 0 0 8px rgba(255, 157, 0, 0.4);
+    }
+
+    #customPopupButtons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .link-orange {
+        color: #ff9d00 !important;
+    }
+
+    .link-orange:hover {
+        color: #ffb74d !important;
+        text-shadow: 0 0 8px rgba(255, 157, 0, 0.4);
+    }
+
     .suggestions-list {
         display: none;
         position: absolute;
@@ -162,12 +212,23 @@
         font-size: 1rem;
         font-weight: 700;
         opacity: 0.8;
-        cursor: not-allowed;
+        cursor: pointer;
         position: relative;
-        background: repeating-linear-gradient(135deg, rgba(136, 136, 136, 0.18) 0 2px, transparent 2px 8px);
+        background: rgba(0, 243, 255, 0.05);
         z-index: 1;
         letter-spacing: 1px;
         text-shadow: 0 0 2px #222, 0 0 1px #00f3ff44;
+    }
+
+    .radio-option input:disabled+span {
+        background: repeating-linear-gradient(135deg, rgba(136, 136, 136, 0.18) 0 2px, transparent 2px 8px);
+        cursor: not-allowed;
+        opacity: 0.5;
+    }
+
+    .radio-option input:not(:disabled):hover+span {
+        box-shadow: 0 0 10px rgba(0, 243, 255, 0.3);
+        border-color: var(--neon-blue);
     }
 
     .radio-option input:checked+span {
@@ -186,7 +247,7 @@
     }
 
     /* Grade Help Tooltip --- */
-    .grade-help-link-container {
+    .help-link-container {
         margin-top: 8px;
         text-align: right;
     }
@@ -205,7 +266,7 @@
         opacity: 1;
     }
 
-    .grade-help-popup {
+    .popup-overlay {
         display: none;
         position: fixed;
         top: 0;
@@ -218,7 +279,7 @@
         z-index: 10000;
     }
 
-    .grade-help-popup-content {
+    .popup-content {
         background: var(--panel-bg);
         border: 2px solid var(--neon-blue);
         border-radius: 10px;
@@ -243,7 +304,7 @@
         color: var(--text-color);
     }
 
-    .close-grade-help {
+    .popup-btn-default {
         background: var(--neon-blue);
         color: #000;
         border: none;
@@ -257,7 +318,7 @@
         transition: background 0.2s, color 0.2s;
     }
 
-    .close-grade-help:hover {
+    .popup-btn-default:hover {
         background: var(--neon-green);
         color: #000;
     }
@@ -325,26 +386,26 @@
     }
 
     /* Check In (Green) */
-    .btn-in {
+    .btn-green {
         border: 2px solid var(--neon-green);
         color: var(--neon-green);
     }
 
-    .btn-in:hover,
-    .btn-in:focus {
+    .btn-green:hover,
+    .btn-green:focus {
         background: var(--neon-green);
         color: #000;
         box-shadow: 0 0 20px var(--neon-green);
     }
 
     /* Check Out (Red) */
-    .btn-out {
+    .btn-red {
         border: 2px solid var(--neon-red);
         color: var(--neon-red);
     }
 
-    .btn-out:hover,
-    .btn-out:focus {
+    .btn-red:hover,
+    .btn-red:focus {
         background: var(--neon-red);
         color: white;
         box-shadow: 0 0 20px var(--neon-red);
