@@ -207,19 +207,6 @@
             });
             return;
         }
-        const selectedGrade = form.grade.value;
-        const entry = studentDatabase[normName];
-        if (entry && String(entry.grade) !== String(selectedGrade)) {
-            showCustomPopup({
-                title: "Grade Change Alert",
-                message: "ALERT:<br><br>Grade changing from '<span style='color:var(--neon-blue)'>" + entry.grade + "</span>' to '<span style='color:var(--neon-green)'>" + selectedGrade + "</span>'.<br><br>Is this correct?",
-                buttons: [
-                    { text: "Cancel" },
-                    { text: "Yes", onClick: () => actuallySubmit(type, form, normName, name) }
-                ]
-            });
-            return;
-        }
 
         if (!set24HourTime()) return;
 
