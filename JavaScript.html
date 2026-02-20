@@ -218,6 +218,16 @@
     }
 
     function set24HourTime() {
+        const hourInput = document.getElementById("timeHour").value.trim();
+        const minInput = document.getElementById("timeMin").value.trim();
+
+        // Failsafe for empty time boxes:
+        // If the user cleared the boxes, revert to the live clock
+        if (hourInput === "" || minInput === "") {
+            isTimeEdited = false;
+            updateTimeUI();
+        }
+
         const hh = parseInt(document.getElementById("timeHour").value);
         const mm = parseInt(document.getElementById("timeMin").value);
         const ampm = document.getElementById("timeAmPm").value;
@@ -255,11 +265,17 @@
 
         // Validate inputs
         if (!form.grade.value) {
+            // Unlock the radio buttons so the returning student can actually fix the issue
+            const radios = document.getElementsByName("grade");
+            for (let r of radios) {
+                r.disabled = false;
+            }
+
             showCustomPopup({
-                title: "ERROR",
-                message: "Please select your Grade.",
+                title: "MISSING GRADE",
+                message: "We couldn't find your grade in the system. Please select your grade below to continue.",
                 buttons: [
-                    { text: "OK" }
+                    { text: "GOT IT" }
                 ]
             });
             return;
