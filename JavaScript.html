@@ -275,7 +275,7 @@
                 message: "Please review your information:<br><br>Name: <span style='color:#ff9d00'>" + name + "</span><br>Grade: <span style='color:#ff9d00'>" + selectedGrade + "</span><br><br>Are you sure?",
                 buttons: [
                     { text: "NO, EDIT", className: "action-btn btn-red", onClick: () => { } },
-                    { text: "YES!", className: "action-btn btn-green", onClick: () => actuallySubmit(type, form, normName, name) }
+                    { text: "YES!", className: "action-btn btn-green", onClick: () => actuallySubmit(type, form) }
                 ]
             });
             return;
@@ -297,7 +297,7 @@
                 message: "UNRECOGNIZED STUDENT: '<span style='color:var(--neon-blue)'>" + name + "</span>'.<br><br>Add this new user to the database?",
                 buttons: [
                     { text: "Cancel" },
-                    { text: "Add", onClick: () => actuallySubmit(type, form, normName, name) }
+                    { text: "Add", onClick: () => actuallySubmit(type, form) }
                 ]
             });
             return;
@@ -311,8 +311,8 @@
     }
 
     // Helper for custom confirm logic
-    function actuallySubmit(type, form, normName, name) {
-        set24HourTime();
+    function actuallySubmit(type, form) {
+        if (!set24HourTime()) return;
 
         document.getElementById("loading").style.display = "flex";
         google.script.run.withSuccessHandler(afterSubmit).processForm(form);
