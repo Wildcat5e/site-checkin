@@ -118,19 +118,6 @@
         document.getElementById("newStudentPopup").style.display = "none";
     }
 
-    function confirmNewStudent() {
-        isNewStudentMode = true;
-        closeNewStudentPopup();
-        updateNameIndicator();
-
-        // Unlock the grade radio buttons
-        const radios = document.getElementsByName("grade");
-        for (let r of radios) {
-            r.disabled = false;
-            r.nextElementSibling.style.cursor = "pointer";
-        }
-    }
-
     function handleHelpLinkClick() {
         if (isNewStudentMode) {
             revertToNormalMode();
