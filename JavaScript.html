@@ -18,7 +18,7 @@
         studentDatabase = data;
     }
 
-    // Clock and Inactivity Logic
+    // Below: Clock and Inactivity Logic
     let inactivityTimer;
 
     function startClock() {
@@ -34,27 +34,31 @@
     function updateTimeUI() {
         if (isTimeEdited) return;
 
-        // Apply grey styling
         const hourBox = document.getElementById("timeHour");
         const minBox = document.getElementById("timeMin");
         const ampmBox = document.getElementById("timeAmPm");
 
+        // Add grey styling to indicate auto-sync mode (only on first run)
         if (!hourBox.classList.contains("auto-sync")) {
             hourBox.classList.add("auto-sync");
             minBox.classList.add("auto-sync");
             ampmBox.classList.add("auto-sync");
         }
 
+        // Get current time
         const now = new Date();
         let hours = now.getHours();
         const minutes = now.getMinutes();
         const ampm = hours >= 12 ? "PM" : "AM";
 
+        // Convert to 12h
         hours = hours % 12;
         hours = hours ? hours : 12;
 
+        // Format minutes with leading zero if required
         const minStr = minutes < 10 ? "0" + minutes : minutes;
 
+        // Update the UI
         hourBox.value = hours;
         minBox.value = minStr;
         ampmBox.value = ampm;
@@ -87,6 +91,7 @@
         resetInactivityTimer(); // Restart the 60s countdown
     }
 
+    // Below: Name Input and New Student Logic
     let isNewStudentMode = false;
 
     function updateNameIndicator() {
@@ -94,6 +99,7 @@
         const normName = input.toLowerCase();
         const indicator = document.getElementById("nameIndicator");
 
+        // Name text box status indicator logic
         if (input === "") {
             indicator.innerText = "[ ? ]";
             indicator.className = "name-indicator indicator-unknown";
@@ -130,7 +136,6 @@
         isNewStudentMode = true;
         closeNewStudentPopup();
 
-        // Clear the text box
         document.getElementById("studentNameInput").value = "";
         updateNameIndicator();
 
@@ -170,6 +175,7 @@
         const name = document.getElementById("studentNameInput").value;
         const normName = name.trim().toLowerCase();
         const entry = studentDatabase[normName];
+
         if (entry && entry.grade) {
             const radios = document.getElementsByName("grade");
             for (let r of radios) {
@@ -191,11 +197,12 @@
     function showGradeHelpPopup() {
         document.getElementById("gradeHelpPopup").style.display = "flex";
     }
+
     function closeGradeHelpPopup() {
         document.getElementById("gradeHelpPopup").style.display = "none";
     }
 
-    // Universal Custom Tooltip Logic
+    // Below: Universal Custom Tooltip Logic
     function showCustomPopup({ title = '', message = '', buttons = [] }) {
         document.getElementById("customPopupTitle").innerText = title;
         document.getElementById("customPopupMsg").innerHTML = message;
@@ -213,6 +220,7 @@
         });
         document.getElementById("customPopup").style.display = "flex";
     }
+
     function closeCustomPopup() {
         document.getElementById("customPopup").style.display = "none";
     }
@@ -222,7 +230,7 @@
         const minInput = document.getElementById("timeMin").value.trim();
 
         // Failsafe for empty time boxes:
-        // If the user cleared the boxes, revert to the live clock
+        // If the user cleared the boxes before submitting, revert to the live clock
         if (hourInput === "" || minInput === "") {
             isTimeEdited = false;
             updateTimeUI();
@@ -232,6 +240,7 @@
         const mm = parseInt(document.getElementById("timeMin").value);
         const ampm = document.getElementById("timeAmPm").value;
 
+        // Validate time input
         if (isNaN(hh) || isNaN(mm) || hh < 1 || hh > 12 || mm < 0 || mm > 59) {
             showCustomPopup({
                 title: "ERROR",
@@ -265,7 +274,7 @@
 
         // Validate inputs
         if (!form.grade.value) {
-            // Unlock the radio buttons so the returning student can actually fix the issue
+            // Unlock the radio buttons so the returning student can fix the issue
             const radios = document.getElementsByName("grade");
             for (let r of radios) {
                 r.disabled = false;
@@ -307,6 +316,7 @@
             });
             return;
         }
+
         if (!studentDatabase[normName]) {
             showCustomPopup({
                 title: "Unrecognized Student",
@@ -336,6 +346,7 @@
 
     function afterSubmit(response) {
         refreshData();
+
         const msg = document.getElementById("statusMsg");
         if (response.status === "ERROR") {
             msg.innerHTML = "ERROR:<br>" + (response.message || "Unknown error.");
@@ -347,6 +358,8 @@
             }, 3000);
             return;
         }
+
+        // Success messages
         if (response.type === "Check In") {
             msg.innerHTML = "ACCESS GRANTED.<br>WELCOME BACK.";
             msg.style.color = "var(--neon-green)";
@@ -373,30 +386,37 @@
         const list = document.getElementById("suggestions");
         const query = input.value.trim().toLowerCase();
         list.innerHTML = "";
+
         if (query.length === 0) {
             list.style.display = "none";
             return;
         }
+
         const allNormNames = Object.keys(studentDatabase);
+
         // Use display names for matching and display
         const startsWith = allNormNames.filter((normName) =>
             studentDatabase[normName].displayName.toLowerCase().startsWith(query),
         );
+
         startsWith.sort((a, b) =>
             studentDatabase[a].displayName.localeCompare(
                 studentDatabase[b].displayName,
             ),
         );
+
         const contains = allNormNames.filter(
             (normName) =>
                 studentDatabase[normName].displayName.toLowerCase().includes(query) &&
                 !studentDatabase[normName].displayName.toLowerCase().startsWith(query),
         );
+
         contains.sort((a, b) =>
             studentDatabase[a].displayName.localeCompare(
                 studentDatabase[b].displayName,
             ),
         );
+
         const matches = [...startsWith, ...contains];
         if (matches.length > 0) {
             list.style.display = "block";

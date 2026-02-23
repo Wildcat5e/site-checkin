@@ -6,8 +6,7 @@ function doGet() {
         .addMetaTag("viewport", "width=device-width, initial-scale=1");
 }
 
-// Standard HTML Service include function
-// This allows content injection from other files into Index.html
+// This allows us to modularize our HTML/CSS/JS
 function include(filename) {
     return HtmlService.createHtmlOutputFromFile(filename).getContent();
 }
@@ -15,6 +14,7 @@ function include(filename) {
 // SPREADSHEET COLUMN SETTINGS
 // Update these numbers if columns are added or moved in the "Students" sheet (1 = A, 2 = B, ...)
 // Note that Java constants are zero-indexed, while Google Sheets columns are 1-indexed.
+// These are the 1-indexed column numbers.
 const COL_NAME = 1;
 const COL_GRADE = 2;
 const COL_STATUS = 3;
@@ -28,7 +28,6 @@ function getStudentList() {
     const ss = SpreadsheetApp.getActiveSpreadsheet();
     const sheet = ss.getSheetByName("Students");
 
-    // Handle empty sheet case
     if (!sheet || sheet.getLastRow() <= 1) return {};
     const data = sheet.getDataRange().getValues();
 
@@ -36,10 +35,12 @@ function getStudentList() {
     if (data.length > 0) data.shift();
     let studentMap = {};
 
+    // Build a map of normalized name -> { displayName, grade }
     data.forEach((row) => {
         const nameValue = row[COL_NAME - 1];
         const gradeValue = row[COL_GRADE - 1];
 
+        // Skip empty rows
         if (nameValue) {
             const displayName = String(nameValue).trim();
             const normName = displayName.toLowerCase();
@@ -77,25 +78,32 @@ function processForm(formObject) {
     if (!["9", "10", "11", "12"].includes(grade)) {
         return { status: "ERROR", message: "Invalid grade." };
     }
+
     // Validate Name
     if (!name) {
         return { status: "ERROR", message: "Name required." };
     }
+
     // Validate Time format (HH:mm)
     if (!/^\d{2}:\d{2}$/.test(timeString)) {
         return { status: "ERROR", message: "Invalid time format." };
     }
+
     const now = new Date();
+
+    // If manual time is provided, override the hours and minutes of 'now'
     const dateString = Utilities.formatDate(
         now,
         Session.getScriptTimeZone(),
         "yyyy-MM-dd",
     );
+
     const timestamp = Utilities.formatDate(
         now,
         Session.getScriptTimeZone(),
         "yyyy-MM-dd HH:mm:ss",
     );
+
     // Update student record (Status, Last Seen, Grade, etc.)
     try {
         updateStudentRecord(studentSheet, name, grade, type, timestamp);
@@ -116,14 +124,15 @@ function updateStudentRecord(sheet, name, newGrade, type, timestamp) {
     // Find row (case-insensitive, trim)
     for (let i = 1; i < data.length; i++) {
         if (String(data[i][COL_NAME - 1]).trim().toLowerCase() === normName) {
-            rowIndex = i + 1; // Convert 0-index to sheet row number
+            rowIndex = i + 1;
             break;
         }
     }
+
     // If new student, add them
     if (rowIndex === -1) {
         // Defend against missing columns by ensuring newRow has enough elements
-        let maxCol = Math.max(COL_NAME, COL_GRADE, COL_DATE_ADDED, sheet.getLastColumn());
+        let maxCol = Math.max(COL_DATE_ADDED, sheet.getLastColumn());
         let newRow = new Array(maxCol).fill("");
 
         newRow[COL_NAME - 1] = name;
