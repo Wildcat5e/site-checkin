@@ -1,5 +1,51 @@
+<!-- 
+Stylesheet.html
+├── 1. CSS Variables
+│   └── :root
+├── 2. Base & Resets
+│   ├── body
+│   ├── h1
+│   └── label
+├── 3. Layout & Structural Containers
+│   ├── .container
+│   └── .styled-section
+├── 4. Global Inputs
+│   ├── input[type="text"]
+│   └── input[type="number"]
+├── 5. Specific Components
+│   ├── A. Name Input & Suggestions
+│   │   ├── .input-wrapper
+│   │   ├── #studentNameInput
+│   │   ├── .name-indicator (plus state classes: known, unknown, new)
+│   │   └── .suggestions-list
+│   ├── B. Grade Selection
+│   │   ├── .radio-group
+│   │   └── .radio-option (plus input states: hover, checked, disabled, focus)
+│   └── C. Time Section
+│       ├── .time-container
+│       └── .time-box (plus .auto-sync)
+├── 6. Buttons
+│   ├── .button-group
+│   ├── .action-btn
+│   ├── .btn-green
+│   └── .btn-red
+├── 7. Modals, Popups & Tooltips
+│   ├── .popup-overlay
+│   ├── .popup-content
+│   ├── #customPopupButtons
+│   ├── .help-link-container
+│   └── .grade-help-link
+└── 8. States & Utilities
+    ├── .link-orange
+    ├── #loading
+    ├── #statusMsg
+    └── .spinner (keyframes)
+-->
+
 <style>
-    /* Theme CSS */
+    /* =========================================
+       1. CSS Variables
+       ========================================= */
     :root {
         --neon-blue: #00f3ff;
         --neon-green: #0aff60;
@@ -9,6 +55,9 @@
         --text-color: #c5c6c7;
     }
 
+    /* =========================================
+       2. Base & Resets
+       ========================================= */
     body {
         background-color: var(--dark-bg);
         color: var(--text-color);
@@ -22,25 +71,6 @@
             linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
         background-size: 20px 20px;
-    }
-
-    .container {
-        background-color: var(--panel-bg);
-        padding: 2rem;
-        border-radius: 10px;
-        box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-        border: 1px solid var(--neon-blue);
-        width: 100%;
-        max-width: 400px;
-        position: relative;
-    }
-
-    .styled-section {
-        margin-bottom: 1.5rem;
-        border: 1px solid var(--neon-blue);
-        border-radius: 8px;
-        padding: 1rem;
-        background: rgba(0, 243, 255, 0.05);
     }
 
     h1 {
@@ -65,7 +95,31 @@
         margin-top: 0;
     }
 
-    /* Text Inputs */
+    /* =========================================
+       3. Layout & Structural Containers
+       ========================================= */
+    .container {
+        background-color: var(--panel-bg);
+        padding: 2rem;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
+        border: 1px solid var(--neon-blue);
+        width: 100%;
+        max-width: 400px;
+        position: relative;
+    }
+
+    .styled-section {
+        margin-bottom: 1.5rem;
+        border: 1px solid var(--neon-blue);
+        border-radius: 8px;
+        padding: 1rem;
+        background: rgba(0, 243, 255, 0.05);
+    }
+
+    /* =========================================
+       4. Global Inputs
+       ========================================= */
     input[type="text"] {
         width: 100%;
         padding: 10px;
@@ -78,16 +132,24 @@
         box-sizing: border-box;
     }
 
-    /* Custom Dropdown */
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* =========================================
+       5. Specific Components
+       ========================================= */
+
+    /* --- A. Name Input & Suggestions --- */
     .input-wrapper {
         position: relative;
         width: 100%;
     }
 
-    /* Name Indicator Styles */
     #studentNameInput {
         padding-right: 60px;
-        /* Prevent text from hiding behind the icon */
     }
 
     .name-indicator {
@@ -115,22 +177,6 @@
 
     .indicator-new {
         color: #ff9d00;
-        text-shadow: 0 0 8px rgba(255, 157, 0, 0.4);
-    }
-
-    #customPopupButtons {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 20px;
-    }
-
-    .link-orange {
-        color: #ff9d00 !important;
-    }
-
-    .link-orange:hover {
-        color: #ffb74d !important;
         text-shadow: 0 0 8px rgba(255, 157, 0, 0.4);
     }
 
@@ -182,7 +228,7 @@
         color: var(--neon-green);
     }
 
-    /* Grade Radio Buttons */
+    /* --- B. Grade Selection --- */
     .radio-group {
         display: flex;
         justify-content: space-between;
@@ -243,33 +289,90 @@
     }
 
     .radio-option input:focus+span {
-        box-shadow:
-            0 0 15px white,
-            0 0 5px var(--neon-blue);
+        box-shadow: 0 0 15px white, 0 0 5px var(--neon-blue);
         border-color: white;
         transform: scale(1.05);
     }
 
-    /* Grade Help Tooltip --- */
-    .help-link-container {
-        margin-top: 8px;
-        text-align: right;
+    /* --- C. Time Section --- */
+    .time-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
     }
 
-    .grade-help-link {
-        color: var(--neon-blue);
-        text-decoration: underline;
+    .time-box {
+        background: #0b0c10;
+        border: 1px solid #45a29e;
+        color: white;
+        font-family: "Exo 2", sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        padding: 10px;
+        text-align: center;
+        width: 100%;
+        transition: color 0.3s, opacity 0.3s;
+    }
+
+    .time-box:focus {
+        outline: none;
+        border-color: var(--neon-green);
+        box-shadow: 0 0 8px rgba(10, 255, 96, 0.5);
+    }
+
+    .time-box.auto-sync {
+        color: #888 !important;
+        opacity: 0.7;
+    }
+
+    /* =========================================
+       6. Buttons
+       ========================================= */
+    .button-group {
+        display: flex;
+        gap: 15px;
+        margin-top: 25px;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 15px;
+        font-family: "Orbitron", sans-serif;
+        font-size: 1rem;
+        font-weight: bold;
         cursor: pointer;
-        font-size: 0.85rem;
-        opacity: 0.8;
-        transition: color 0.2s;
+        text-transform: uppercase;
+        background: transparent;
+        transition: 0.3s;
     }
 
-    .grade-help-link:hover {
+    .btn-green {
+        border: 2px solid var(--neon-green);
         color: var(--neon-green);
-        opacity: 1;
     }
 
+    .btn-green:hover,
+    .btn-green:focus {
+        background: var(--neon-green);
+        color: #000;
+        box-shadow: 0 0 20px var(--neon-green);
+    }
+
+    .btn-red {
+        border: 2px solid var(--neon-red);
+        color: var(--neon-red);
+    }
+
+    .btn-red:hover,
+    .btn-red:focus {
+        background: var(--neon-red);
+        color: white;
+        box-shadow: 0 0 20px var(--neon-red);
+    }
+
+    /* =========================================
+       7. Modals, Popups & Tooltips
+       ========================================= */
     .popup-overlay {
         display: none;
         position: fixed;
@@ -295,14 +398,40 @@
         max-width: 90vw;
     }
 
-    .grade-help-popup-content strong {
+    #customPopupButtons {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 20px;
+    }
+
+    .help-link-container {
+        margin-top: 8px;
+        text-align: right;
+    }
+
+    .grade-help-link {
+        color: var(--neon-blue);
+        text-decoration: underline;
+        cursor: pointer;
+        font-size: 0.85rem;
+        opacity: 0.8;
+        transition: color 0.2s;
+    }
+
+    .grade-help-link:hover {
+        color: var(--neon-green);
+        opacity: 1;
+    }
+
+    .popup-content strong {
         display: block;
         color: var(--neon-blue);
         font-size: 1.1rem;
         margin-bottom: 0.7rem;
     }
 
-    .grade-help-popup-content p {
+    .popup-content p {
         margin: 0 0 1.2rem 0;
         font-size: 1rem;
         color: var(--text-color);
@@ -327,95 +456,18 @@
         color: #000;
     }
 
-    /* Time Section Styling */
-    .time-container {
-        display: flex;
-        justify-content: space-between;
-        gap: 10px;
+    /* =========================================
+       8. States & Utilities
+       ========================================= */
+    .link-orange {
+        color: #ff9d00 !important;
     }
 
-    .time-box {
-        background: #0b0c10;
-        border: 1px solid #45a29e;
-        color: white;
-        font-family: "Exo 2", sans-serif;
-        font-weight: 700;
-        font-size: 1.5rem;
-        padding: 10px;
-        text-align: center;
-        width: 100%;
+    .link-orange:hover {
+        color: #ffb74d !important;
+        text-shadow: 0 0 8px rgba(255, 157, 0, 0.4);
     }
 
-    .time-box:focus {
-        outline: none;
-        border-color: var(--neon-green);
-        box-shadow: 0 0 8px rgba(10, 255, 96, 0.5);
-    }
-
-    .time-box.auto-sync {
-        color: #888 !important;
-        opacity: 0.7;
-    }
-
-    .time-box {
-        transition:
-            color 0.3s,
-            opacity 0.3s;
-    }
-
-    /* Hide arrows on number input */
-    input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-        -webkit-appearance: none;
-        margin: 0;
-    }
-
-    /* Dual Buttons */
-    .button-group {
-        display: flex;
-        gap: 15px;
-        margin-top: 25px;
-    }
-
-    .action-btn {
-        flex: 1;
-        padding: 15px;
-        font-family: "Orbitron", sans-serif;
-        font-size: 1rem;
-        font-weight: bold;
-        cursor: pointer;
-        text-transform: uppercase;
-        background: transparent;
-        transition: 0.3s;
-    }
-
-    /* Check In (Green) */
-    .btn-green {
-        border: 2px solid var(--neon-green);
-        color: var(--neon-green);
-    }
-
-    .btn-green:hover,
-    .btn-green:focus {
-        background: var(--neon-green);
-        color: #000;
-        box-shadow: 0 0 20px var(--neon-green);
-    }
-
-    /* Check Out (Red) */
-    .btn-red {
-        border: 2px solid var(--neon-red);
-        color: var(--neon-red);
-    }
-
-    .btn-red:hover,
-    .btn-red:focus {
-        background: var(--neon-red);
-        color: white;
-        box-shadow: 0 0 20px var(--neon-red);
-    }
-
-    /* Loading and Status */
     #loading {
         display: none;
         position: absolute;
