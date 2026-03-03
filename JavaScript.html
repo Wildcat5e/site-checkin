@@ -93,6 +93,7 @@
 
     // Below: Name Input and New Student Logic
     let isNewStudentMode = false;
+    let currentSuggestionIndex = -1;
 
     function updateNameIndicator() {
         const input = document.getElementById("studentNameInput").value.trim();
@@ -382,6 +383,7 @@
 
     // Dropdown Logic
     function showSuggestions() {
+        currentSuggestionIndex = -1;
         const input = document.getElementById("studentNameInput");
         const list = document.getElementById("suggestions");
         const query = input.value.trim().toLowerCase();
@@ -449,12 +451,52 @@
         }
     });
 
-    // Close suggestions on Escape key
-    document
-        .getElementById("studentNameInput")
-        .addEventListener("keydown", function (e) {
-            if (e.key === "Escape") {
-                document.getElementById("suggestions").style.display = "none";
+    // Keyboard navigation for the suggestions dropdown
+    document.getElementById("studentNameInput").addEventListener("keydown", function (e) {
+        const list = document.getElementById("suggestions");
+        const items = list.getElementsByTagName("li");
+
+        // Only process navigation if the dropdown is visible and has items
+        if (list.style.display === "block" && items.length > 0) {
+            if (e.key === "ArrowDown") {
+                e.preventDefault(); // Prevent cursor from jumping to the end of the text box
+                currentSuggestionIndex++;
+                if (currentSuggestionIndex >= items.length) currentSuggestionIndex = 0; // Wrap to top
+                setActiveSuggestion(items);
+            } else if (e.key === "ArrowUp") {
+                e.preventDefault();
+                currentSuggestionIndex--;
+                if (currentSuggestionIndex < 0) currentSuggestionIndex = items.length - 1; // Wrap to bottom
+                setActiveSuggestion(items);
+            } else if (e.key === "Enter") {
+                e.preventDefault(); // Prevent standard form submission
+                if (currentSuggestionIndex > -1) {
+                    // Simulate a click on the highlighted item
+                    items[currentSuggestionIndex].click();
+                }
+            } else if (e.key === "Escape") {
+                list.style.display = "none";
+                currentSuggestionIndex = -1;
             }
-        });
+        } else if (e.key === "Enter") {
+            // Prevent accidental form submission if they hit Enter while the list is closed
+            e.preventDefault();
+        }
+    });
+
+    // Helper function to update the visual state of the list
+    function setActiveSuggestion(items) {
+        // Clear the active class from all items
+        for (let i = 0; i < items.length; i++) {
+            items[i].classList.remove("active");
+        }
+
+        // Apply the active class to the selected item
+        if (currentSuggestionIndex > -1 && currentSuggestionIndex < items.length) {
+            items[currentSuggestionIndex].classList.add("active");
+
+            // Automatically scroll the list if the highlighted item goes out of view
+            items[currentSuggestionIndex].scrollIntoView({ block: "nearest" });
+        }
+    }
 </script>
