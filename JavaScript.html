@@ -332,6 +332,12 @@
 
         if (!set24HourTime()) return;
 
+        // Unlock radios temporarily so the grade is sent to the backend
+        const radios = document.getElementsByName("grade");
+        for (let r of radios) {
+            r.disabled = false;
+        }
+
         // Send to backend
         document.getElementById("loading").style.display = "flex";
         google.script.run.withSuccessHandler(afterSubmit).processForm(form);
@@ -340,6 +346,12 @@
     // Helper for custom confirm logic
     function actuallySubmit(type, form) {
         if (!set24HourTime()) return;
+
+        // Unlock radios temporarily so the grade is sent to the backend
+        const radios = document.getElementsByName("grade");
+        for (let r of radios) {
+            r.disabled = false;
+        }
 
         document.getElementById("loading").style.display = "flex";
         google.script.run.withSuccessHandler(afterSubmit).processForm(form);
