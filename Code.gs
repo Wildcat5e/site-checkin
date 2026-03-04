@@ -91,6 +91,11 @@ function processForm(formObject) {
 
     const now = new Date();
 
+    if (timeString) {
+        const [hours, minutes] = timeString.split(':');
+        now.setHours(parseInt(hours, 10), parseInt(minutes, 10), 0, 0);
+    }
+
     // If manual time is provided, override the hours and minutes of 'now'
     const dateString = Utilities.formatDate(
         now,
