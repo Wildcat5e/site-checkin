@@ -1,121 +1,147 @@
 <!doctype html>
 <html>
-  <head>
+
+<head>
     <base target="_top" />
     <link
-      href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;700&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap"
-      rel="stylesheet"
-    />
+        href="https://fonts.googleapis.com/css2?family=Exo+2:wght@500;700&family=Orbitron:wght@400;700&family=Roboto+Mono:wght@300;400&display=swap"
+        rel="stylesheet" />
 
-    <!-- Inject CSS here -->
+    <!-- Inject CSS -->
     <?!= include('Stylesheet'); ?>
-  </head>
-  <body>
+</head>
+
+<body>
     <div class="container">
-      <h1>FRC Check In/Out</h1>
+        <h1>FRC Check In/Out</h1>
 
-      <form id="accessForm">
-        <input type="hidden" name="checkType" id="hiddenCheckType" />
-        <input type="hidden" name="manualTime" id="hiddenManualTime" />
+        <form id="accessForm">
+            <input type="hidden" name="checkType" id="hiddenCheckType" />
+            <input type="hidden" name="manualTime" id="hiddenManualTime" />
 
-        <label>STUDENT NAME</label>
-        <div class="input-wrapper">
-          <input
-            type="text"
-            name="studentName"
-            id="studentNameInput"
-            placeholder="Begin typing name..."
-            required
-            autocomplete="off"
-            oninput="showSuggestions()"
-            onfocus="showSuggestions()"
-          />
-          <ul id="suggestions" class="suggestions-list"></ul>
+
+            <fieldset class="styled-section">
+                <legend>STUDENT NAME</legend>
+                <div class="input-wrapper">
+                    <input type="text" name="studentName" id="studentNameInput" placeholder="Begin typing name..."
+                        required autocomplete="off" aria-autocomplete="list" aria-controls="suggestions"
+                        aria-label="Student Name" oninput="showSuggestions(); updateNameIndicator();"
+                        onfocus="showSuggestions()" />
+
+                    <span id="nameIndicator" class="name-indicator indicator-unknown">?</span>
+
+                    <ul id="suggestions" class="suggestions-list" role="listbox" aria-label="Student suggestions"></ul>
+                </div>
+
+                <div class="help-link-container">
+                    <span id="modeToggleLink" class="grade-help-link" onclick="handleHelpLinkClick()">First time
+                        here?</span>
+                </div>
+
+                <div id="newStudentPopup" class="popup-overlay">
+                    <div class="popup-content">
+                        <strong>First time here?</strong>
+                        <p>Please type your full name exactly correctly (including correct spelling and capitalization).
+                        </p>
+                        <p>For your first check-in, you will also need to select your grade below.</p>
+                        <div class="button-group" style="margin-top: 20px;">
+                            <button type="button" class="action-btn btn-red"
+                                onclick="closeNewStudentPopup()">CANCEL</button>
+                            <button type="button" class="action-btn btn-green" onclick="confirmNewStudent()">YES, I'M
+                                NEW!</button>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <fieldset class="styled-section">
+                <legend>GRADE</legend>
+                <div class="radio-group">
+                    <label class="radio-option">
+                        <input type="radio" name="grade" value="9" aria-label="Grade 9" disabled />
+                        <span>09</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="grade" value="10" aria-label="Grade 10" disabled />
+                        <span>10</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="grade" value="11" aria-label="Grade 11" disabled />
+                        <span>11</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="grade" value="12" aria-label="Grade 12" disabled />
+                        <span>12</span>
+                    </label>
+                </div>
+
+                <div class="help-link-container">
+                    <span class="grade-help-link" onclick="showGradeHelpPopup()">Incorrect grade?</span>
+                </div>
+                <div id="gradeHelpPopup" class="popup-overlay">
+                    <div class="popup-content">
+                        <strong>Incorrect grade?</strong>
+                        <p>Please speak to Mr. Spencer <strong>ASAP</strong> about changing your grade in his database.
+                        </p>
+                        <p>For now, Check In using the incorrect grade.</p>
+                        <button class="popup-btn-default" onclick="closeGradeHelpPopup()">GOT IT!</button>
+                    </div>
+                </div>
+            </fieldset>
+
+
+            <fieldset class="styled-section">
+                <legend>TIME</legend>
+                <div class="time-container">
+                    <input type="number" id="timeHour" class="time-box" min="1" max="12" placeholder="HH"
+                        aria-label="Hour" onfocus="stopClock()" />
+                    <input type="number" id="timeMin" class="time-box" min="0" max="59" placeholder="MM"
+                        aria-label="Minute" onfocus="stopClock()" />
+                    <select id="timeAmPm" class="time-box" aria-label="AM/PM" onfocus="stopClock()"
+                        style="cursor: pointer">
+                        <option value="AM">AM</option>
+                        <option value="PM">PM</option>
+                    </select>
+                </div>
+            </fieldset>
+
+
+            <fieldset class="styled-section">
+                <legend>NOTES</legend>
+                <input type="text" name="notes" id="notesInput" placeholder="Notes (Optional)" aria-label="Notes" />
+            </fieldset>
+
+            <div class="button-group">
+                <button type="button" class="action-btn btn-green" onclick="triggerSubmit('Check In')"
+                    aria-label="Check In">
+                    CHECK IN
+                </button>
+                <button type="button" class="action-btn btn-red" onclick="triggerSubmit('Check Out')"
+                    aria-label="Check Out">
+                    CHECK OUT
+                </button>
+            </div>
+        </form>
+
+        <div id="loading">
+            <div class="spinner"></div>
+            <p id="statusMsg" style="color: white; margin-top: 10px">
+                PROCESSING...
+            </p>
         </div>
-
-        <label>GRADE</label>
-        <div class="radio-group">
-          <label class="radio-option"
-            ><input type="radio" name="grade" value="9" /><span>09</span></label
-          >
-          <label class="radio-option"
-            ><input type="radio" name="grade" value="10" /><span
-              >10</span
-            ></label
-          >
-          <label class="radio-option"
-            ><input type="radio" name="grade" value="11" /><span
-              >11</span
-            ></label
-          >
-          <label class="radio-option"
-            ><input type="radio" name="grade" value="12" /><span
-              >12</span
-            ></label
-          >
-        </div>
-
-        <label>TIME</label>
-        <div class="time-container">
-          <input
-            type="number"
-            id="timeHour"
-            class="time-box"
-            min="1"
-            max="12"
-            placeholder="HH"
-            onfocus="stopClock()"
-          />
-          <input
-            type="number"
-            id="timeMin"
-            class="time-box"
-            min="0"
-            max="59"
-            placeholder="MM"
-            onfocus="stopClock()"
-          />
-          <select
-            id="timeAmPm"
-            class="time-box"
-            onfocus="stopClock()"
-            style="cursor: pointer"
-          >
-            <option value="AM">AM</option>
-            <option value="PM">PM</option>
-          </select>
-        </div>
-
-        <label>NOTES</label>
-        <input type="text" name="notes" placeholder="Notes (Optional)" />
-
-        <div class="button-group">
-          <button
-            type="button"
-            class="action-btn btn-in"
-            onclick="triggerSubmit('Check In')"
-          >
-            CHECK IN
-          </button>
-          <button
-            type="button"
-            class="action-btn btn-out"
-            onclick="triggerSubmit('Check Out')"
-          >
-            CHECK OUT
-          </button>
-        </div>
-      </form>
-
-      <div id="loading">
-        <div class="spinner"></div>
-        <p id="statusMsg" style="color: white; margin-top: 10px">
-          PROCESSING...
-        </p>
-      </div>
     </div>
 
-    <!-- Inject JavaScript here -->
+    <!-- Inject JavaScript -->
     <?!= include('JavaScript'); ?>
-  </body>
+
+    <!-- Custom Popup Modal for all alerts/confirms -->
+    <div id="customPopup" class="popup-overlay" style="display:none;">
+        <div class="popup-content" id="customPopupContent">
+            <strong id="customPopupTitle"></strong>
+            <p id="customPopupMsg"></p>
+            <div id="customPopupButtons"></div>
+        </div>
+    </div>
+</body>
+
 </html>
